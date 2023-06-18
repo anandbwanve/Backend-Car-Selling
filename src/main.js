@@ -128,6 +128,28 @@ async function findAllUser(req, res) {
   }
 }
 
+async function addUserRecord1(req, res) {
+  try {
+    const uri = "mongodb://127.0.0.1:27017";
+    const client = new MongoClient(uri);
+
+    const db = client.db("project");
+    const messageColl = db.collection("user");
+
+    let inputDoc = {
+      contact:req.query.contact,
+      email: req.query.email,
+      address: req.query.address,
+    };
+    await messageColl.insertOne(inputDoc);
+
+    await client.close();
+
+    res.json({ opr: true });
+  } catch (err) {
+    res.status(500).send(err.message);
+  }
+}
 // LOGIN - AUTHENTICATION
 async function loginByGet(req, res) {
   try {
@@ -190,6 +212,7 @@ app.post("/hello", helloPost);
 app.get("/addtodo", addTodo);
 app.get("/find-all-todo", findAllTodo);
 app.get("/adduser", addUserRecord);
+app.get("/adduser1", addUserRecord1);
 app.get("/find-all-user", findAllUser);
 app.get("/login-by-get", loginByGet);
 app.post("/login-by-post", loginByPost);
