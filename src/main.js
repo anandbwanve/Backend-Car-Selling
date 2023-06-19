@@ -92,7 +92,7 @@ async function addUserRecord1(req, res) {
     res.status(500).send(err.message);
   }
 }
-// LOGIN - AUTHENTICATION
+// Login auth
 async function loginByGet(req, res) {
   try {
     const uri = "mongodb://127.0.0.1:27017";
@@ -127,7 +127,7 @@ async function deletEnquiry(req, res) {
     const db = client.db("project");
     const messageColl = db.collection("enquiry");
 
-    const email = req.params.email; // Assuming the email is passed as a route parameter
+    const email = req.params.email; // email is passed as a route parameter
     const result = await messageColl.deleteOne({ email: email });
 
     await client.close();
