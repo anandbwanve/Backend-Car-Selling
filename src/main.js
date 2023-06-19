@@ -1,6 +1,7 @@
 import { MongoClient } from "mongodb";
 import express from "express";
 import cors from "cors";
+import { ObjectId } from "mongodb";
 
 const app = express();
 app.use(cors()); // allowing everyone.
@@ -128,13 +129,30 @@ async function findAllUser(req, res) {
   }
 }
 
+async function enquiryshow(req, res) {
+  try {
+    const uri = "mongodb://127.0.0.1:27017";
+    const client = new MongoClient(uri);
+
+    const db = client.db("project");
+    const messageColl = db.collection("enquiry");
+
+    let list = await messageColl.find().toArray();
+
+    await client.close();
+    res.json(list);
+  } catch (err) {
+    res.status(500).send(err.message);
+  }
+}
+
 async function addUserRecord1(req, res) {
   try {
     const uri = "mongodb://127.0.0.1:27017";
     const client = new MongoClient(uri);
 
     const db = client.db("project");
-    const messageColl = db.collection("user");
+    const messageColl = db.collection("enquiry");
 
     let inputDoc = {
       contact:req.query.contact,
@@ -177,6 +195,28 @@ async function loginByGet(req, res) {
   }
 }
 
+async function deletEnquiry(req, res) {
+  try {
+    const uri = "mongodb://127.0.0.1:27017";
+    const client = new MongoClient(uri);
+
+    const db = client.db("project");
+    const messageColl = db.collection("enquiry");
+
+    const enquiryId = req.params.id; // Assuming the ID of the enquiry is passed as a route parameter
+    // console.log(enquiryId);
+    // const result = await messageColl.findByIdAndDelete(enquiryId);
+    const result = await messageColl.deleteOne({ _id: ObjectId(enquiryId) });
+
+    await client.close();
+
+    res.send(result);
+  } catch (err) {
+    res.status(500).send(err.message);
+  }
+}
+
+
 async function loginByPost(req, res) {
   try {
     const uri = "mongodb://127.0.0.1:27017";
@@ -216,6 +256,8 @@ app.get("/adduser1", addUserRecord1);
 app.get("/find-all-user", findAllUser);
 app.get("/login-by-get", loginByGet);
 app.post("/login-by-post", loginByPost);
+app.get("/enquiryshow", enquiryshow);
+app.use("/deletEnquiry/:id", deletEnquiry);
 
 // http://localhost:4000/
 app.listen(4000);
